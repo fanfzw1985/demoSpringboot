@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.fzw.mapper.WxUserInfoMapper" >
+  <resultMap id="BaseResultMap" type="cn.fzw.weixin.vo.WxUserInfo" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="subscribe" property="password" jdbcType="VARCHAR" />
+    <result column="openid" property="password" jdbcType="VARCHAR" />
+    <result column="nickname" property="password" jdbcType="VARCHAR" />
+    <result column="sex" property="password" jdbcType="VARCHAR" />
+    <result column="city" property="password" jdbcType="VARCHAR" />
+    <result column="country" property="password" jdbcType="VARCHAR" />
+    <result column="province" property="password" jdbcType="VARCHAR" />
+    <result column="language" property="password" jdbcType="VARCHAR" />
+    <result column="headimgurl" property="password" jdbcType="VARCHAR" />
+    <result column="subscribe_time" property="password" jdbcType="VARCHAR" />
+    <result column="unionid" property="password" jdbcType="VARCHAR" />
+    <result column="remark" property="password" jdbcType="VARCHAR" />
+    <result column="groupid" property="password" jdbcType="VARCHAR" />
+    <result column="tagid_list" property="password" jdbcType="VARCHAR" />
+    <result column="subscribe_scene" property="password" jdbcType="VARCHAR" />
+    <result column="qr_scene" property="password" jdbcType="VARCHAR" />
+    <result column="qr_scene_str" property="password" jdbcType="VARCHAR" />
+    <result column="username" property="username" jdbcType="VARCHAR" />
+  </resultMap>
+    <sql id="Base_Column_List" >
+    id, subscribe,openid,nickname,sex,city,country,province,language,headimgurl,
+		subscribe_time,unionid,remark,groupid,tagid_list,subscribe_scene,qr_scene,qr_scene_str,username
+  </sql>
+  <select id="selectByOpenid" resultType="cn.fzw.weixin.vo.WxUserInfo">
+  	select 
+  	<include refid="Base_Column_List" />
+  	from wx_userinfo where openid=#{openid}
+  </select>
+  
+  <insert id="insertInto">
+  insert into  wx_userinfo values(null,#{subscribe},#{openid},#{nickname},#{sex},#{city},#{country},#{province},
+  		#{language},#{headimgurl},#{subscribe_time},#{unionid},#{remark},#{groupid},#{tagid_list},
+  		#{subscribe_scene},#{qr_scene},#{qr_scene_str},null)
+  </insert>
+  <update id="updateById">
+  	update wx_userinfo set subscribe=#{subscribe},openid=#{openid},nickname=#{nickname},sex=#{sex},
+  	city=#{city},country=#{country},province=#{province},language=#{language},headimgurl=#{headimgurl},
+  	subscribe_time=#{subscribe_time},unionid=#{unionid},remark=#{remark},groupid=#{groupid},tagid_list=#{tagid_list},
+  		subscribe_scene=#{subscribe_scene},qr_scene=#{qr_scene},qr_scene_str=#{qr_scene_str} where id=#{id}
+  </update>
+  
+  <select id="selectByUsernameAndPassword" resultType="cn.fzw.vo.Users" parameterType="java.lang.String">
+    select
+  	 <include refid="Base_Column_List" />
+    from user_db where username=#{username} and password=#{password}
+    <!--    <where>
+    	<if test="username!=null and username!=''">
+    		and username=#{username}
+    	</if>
+    	<if test="password!=null and password!=''">
+    		and password=#{password}
+    	</if>
+    </where>
+ where username = #{username,jdbcType=VARCHAR} -->
+  </select>
+  </mapper>

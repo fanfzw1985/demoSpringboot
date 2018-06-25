@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.fzw.mapper.PhotoMapper" >
+  <resultMap id="BaseResultMap" type="cn.fzw.vo.PhotoUpLoad" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="username" property="username"  jdbcType="VARCHAR" />
+    <result column="photoRealName" property="photoRealName" jdbcType="VARCHAR" />
+    <result column="photoName" property="photoName" jdbcType="VARCHAR" />
+    <result column="photoPath" property="photoPath" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
+  </resultMap>
+    <sql id="Base_Column_List" >
+    id, username,photoRealName,photoName,photoPath,time
+ 	 </sql>
+ 	
+    <insert id="insertByusernameAndPath">
+  	insert into photo_db(username,photoRealName,photoName,photoPath,time) VALUES (#{username},#{photoRealName},#{photoName},#{photoPath},sysdate())
+  </insert>
+ 
+   <select id="selectByPhotoName" resultType="java.lang.Integer">
+    select  count(*) from photo_db where photoName=#{photoName}
+  </select>
+   
+  <select id="selectAll" resultMap="BaseResultMap">
+    SELECT 
+  	 <include refid="Base_Column_List" />
+     FROM photo_db WHERE username IN (#{superadmin1}, #{superadmin2}) ORDER BY TIME DESC LIMIT 0, 10
+  </select>
+  
+   <select id="selectAllByPage" resultMap="BaseResultMap">
+  		SELECT  
+  		<include refid="Base_Column_List" />
+        from  photo_db WHERE username=#{username}  ORDER BY TIME DESC limit #{pageStart},#{photoWallNum} 
+  </select>
+   
+    <select id="selectAllInPhotos" resultType="java.lang.Integer">
+  		SELECT count(*) from photo_db WHERE username=#{username}
+  </select>
+   
+    <select id="selectPhotoById" resultMap="BaseResultMap">
+    SELECT
+  	 <include refid="Base_Column_List" />
+    from photo_db where id=#{id}
+  </select>
+  
+  <delete id="deleteById">
+  	DELETE from photo_db WHERE id=#{id}
+  </delete>
+  
+  <select id="selectNextSidePhoto" resultMap="BaseResultMap">
+    SELECT
+  	 <include refid="Base_Column_List" />
+    FROM photo_db WHERE id=(SELECT IFNULL(MIN(a.id),#{id}) FROM photo_db a WHERE a.username=#{username} and a.id>#{id})
+  </select>
+  
+  <select id="selectLastSidePhoto" resultMap="BaseResultMap">
+    SELECT
+  	 <include refid="Base_Column_List" />
+    FROM photo_db WHERE id=(SELECT IFNULL(MAX(a.id),#{id}) FROM photo_db a WHERE a.username=#{username} and a.id&lt;#{id})
+  </select>
+  </mapper>

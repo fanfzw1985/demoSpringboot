@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.fzw.mapper.RecordMapper" >
+  <resultMap id="BaseResultMap" type="cn.fzw.vo.Records" >
+    <id column="id" property="id" jdbcType="INTEGER"  javaType="INTEGER"/>
+    <result column="username" property="username" jdbcType="VARCHAR"  javaType="String"/>
+    <result column="name" property="name" jdbcType="VARCHAR"  javaType="String"/>
+    <result column="message" property="message" jdbcType="VARCHAR" javaType="String"/>
+    <result column="time" property="time" jdbcType="VARCHAR" javaType="Date"/>
+    <result column="flag" property="flag" jdbcType="INTEGER" javaType="INTEGER"/>
+  </resultMap>
+    <sql id="Base_Column_List" >
+    id, username,name,message,time,flag
+  </sql>
+  <insert id="insertInto" parameterType="cn.fzw.vo.Records">
+    insert into record_db(username,name,message,flag,time) VALUES (#{username},#{name},#{recordmsg},#{flag},sysdate())
+  </insert>
+  <select id="selectAllByPage" resultMap="BaseResultMap">
+  		select  <include refid="Base_Column_List" />
+          from  record_db  where flag=#{flag} ORDER BY TIME DESC limit #{pageStart},#{pageEnd}
+  
+  </select>
+  
+  <select id="showMessageBoardById" resultType="cn.fzw.vo.Records" parameterType="java.lang.Integer">
+  	select  <include refid="Base_Column_List" />
+          from  record_db  where id=#{id}
+  </select>
+  
+  <update id="updateBoardById">
+  	update record_db set message=#{messageBoardUpdate},modified_time=sysdate() where id=#{id}
+  </update>
+  
+  <select id="selectByNameAndMessage" resultMap="BaseResultMap">
+  select  <include refid="Base_Column_List" />
+          from  record_db  where name=#{name} and message like concat(concat('%',#{updatMsg}),'%')
+  </select>
+  <delete id="deleteRecordById" parameterType="java.lang.Integer" >
+  	delete from record_db where id=#{id}
+  </delete>
+  </mapper>

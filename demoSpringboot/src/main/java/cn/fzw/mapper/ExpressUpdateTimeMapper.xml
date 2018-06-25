@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.fzw.mapper.ExpressUpdateTimeMapper" >
+  <resultMap id="BaseResultMap" type="cn.fzw.weixin.vo.ExpressUpdateTime" >
+    <id column="id" property="id" jdbcType="INTEGER" />
+    <result column="fromusername" property="fromusername" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="tracking_number" property="tracking_number" jdbcType="VARCHAR" />
+    <result column="time" property="time" jdbcType="VARCHAR" />
+  </resultMap>
+    <sql id="Base_Column_List" >
+    id, fromusername, code, tracking_number, time
+  </sql>
+  
+   <insert id="insertInto">
+   		insert into expressupdatetime(fromusername, code, tracking_number, time) values(#{fromusername},#{code},#{tracking_number},sysdate())
+   </insert>
+   
+   <update id="updateByCodeAndNum">
+   		update expressupdatetime set fromusername=#{fromusername},time=sysdate() where code=#{code} and tracking_number=#{tracking_number}
+   </update>
+   
+   <select id="selectByTime">
+   	select
+  	 <include refid="Base_Column_List" />
+    from  expressupdatetime  where time &lt; DATE_SUB(sysdate(),INTERVAL 1 MONTH)
+   </select>
+   
+   <delete id="deleteById">
+   	delete from expressupdatetime where id &lt; =#{id}
+   </delete>
+  </mapper>

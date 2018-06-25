@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper 
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cn.fzw.mapper.AccountMapper" >
+  <resultMap id="BaseResultMap" type="cn.fzw.vo.Account" >
+    <id column="id" property="id" jdbcType="INTEGER" javaType="INTEGER"/>
+    <result column="username" property="username" jdbcType="VARCHAR" javaType="String"/>
+    <result column="name" property="name" jdbcType="VARCHAR" javaType="String"/>
+    <result column="item" property="item" jdbcType="VARCHAR" javaType="String"/>
+    <result column="account" property="account" jdbcType="VARCHAR" javaType="String"/>
+    <result column="money" property="money" jdbcType="INTEGER" javaType="Double"/>
+    <result column="flag" property="flag" jdbcType="INTEGER" javaType="INTEGER"/>
+	<result column="item_desc" property="item_desc" jdbcType="VARCHAR" javaType="String"/>
+	<result column="time" property="time" jdbcType="VARCHAR"  javaType="Date"/>
+  </resultMap>
+ 
+    <sql id="Base_Column_List" >
+    id,username,name,item,account,money,flag,item_desc,time
+  </sql>
+  
+  <select id="selectById" resultType="cn.fzw.vo.Account" parameterType="java.lang.Integer">
+    select 
+		 <include refid="Base_Column_List" />
+    from account_db where  id=#{id}
+  </select>
+  <select id="selectAllByPage2" resultMap="BaseResultMap">
+  	select 
+		 <include refid="Base_Column_List" />
+    from account_db
+    <where>
+    	<if test="username!=null and username!=''">
+    		and username=#{username}
+    	</if>
+    	<if test="flag!=0">
+    		and flag=#{flag}
+    	</if>
+    	<if test="account!=null and account!=''">
+    		and account=#{account}
+    	</if>
+    	<if test="item!=null and item!=''">
+    		and item=#{item}
+    	</if>
+    	    	<if test="time1!=null and time1!=''">
+    		<if test="time2!=null and time2!=''">
+    		and TO_DAYS(time) between TO_DAYS(#{time1}) and TO_DAYS(#{time2})
+    		</if>
+    		<if test="time2==null or time2==''">
+    		and TO_DAYS(time)>TO_DAYS(#{time1})
+    		</if>
+    	</if>
+    	<if test="time1==null or time1==''">
+    		<if test="time2!=null and time2!=''">
+    		and TO_DAYS(time) &lt; TO_DAYS(#{time2})
+    		</if>
+    	</if>
+    </where>
+  ORDER BY TIME DESC limit #{pageStart},#{accountPageNum}
+  </select>
+  <select id="selectCountInAccount" resultType="cn.fzw.vo.AccountSelect">
+SELECT
+	count(*) count,
+	sum(
+		CASE
+		WHEN flag = '1'
+		AND DATE_FORMAT(time, '%Y%m') = DATE_FORMAT(CURDATE(), '%Y%m') THEN
+			money
+		ELSE
+			0
+		END
+	) sumFlag1,
+	sum(
+		CASE
+		WHEN flag = '2'
+		AND DATE_FORMAT(time, '%Y%m') = DATE_FORMAT(CURDATE(), '%Y%m') THEN
+			money
+		ELSE
+			0
+		END
+	) sumFlag2
+FROM
+	account_db
+WHERE
+	username =#{username}
+  </select>
+ <!-- 根据条件查询明细 -->
+  <select id="selectCountInAccount2" resultType="cn.fzw.vo.AccountSelect">
+  	SELECT
+		count(*) count,
+		sum(
+		CASE
+		WHEN flag = '1'
+		AND DATE_FORMAT(time, '%Y%m') = DATE_FORMAT(CURDATE(), '%Y%m') THEN
+			money
+		ELSE
+			0
+		END
+	) sumFlag1,
+	sum(
+		CASE
+		WHEN flag = '2'
+		AND DATE_FORMAT(time, '%Y%m') = DATE_FORMAT(CURDATE(), '%Y%m') THEN
+			money
+		ELSE
+			0
+		END
+	) sumFlag2
+	 from account_db
+    <where>
+    	<if test="username!=null and username!=''">
+    		and username=#{username}
+    	</if>
+    	<if test="flag!=0">
+    		and flag=#{flag}
+    	</if>
+    	<if test="account!=null and account!=''">
+    		and account=#{account}
+    	</if>
+    	<if test="item!=null and item!=''">
+    		and item=#{item}
+    	</if>
+    	<if test="time1!=null and time1!=''">
+    		<if test="time2!=null and time2!=''">
+    		and TO_DAYS(time) between TO_DAYS(#{time1}) and TO_DAYS(#{time2})
+    		</if>
+    		<if test="time2==null or time2==''">
+    		and TO_DAYS(time)>TO_DAYS(#{time1})
+    		</if>
+    	</if>
+    	<if test="time1==null or time1==''">
+    		<if test="time2!=null and time2!=''">
+    		and TO_DAYS(time) &lt; TO_DAYS(#{time2})
+    		</if>
+    	</if>
+    </where>  
+  </select>
+  
+  <insert id="insertInto">
+  	insert into account_db
+  (username, name, item, account,money, flag, item_desc, time)
+	VALUES
+  (#{username}, #{name}, #{item}, #{account},#{money}, #{flag}, #{item_desc}, #{time})
+  </insert>
+  
+    <select id="selectAllByPage" resultMap="BaseResultMap">
+  		  select b.id,b.username,b.name,b.item,b.account,b.money,b.flag,b.item_desc,b.time 
+          from account_db b where b.username=#{username} ORDER BY TIME DESC  limit #{pageStart},#{pageEnd}
+  </select>
+  
+  <select id="selectByTime" resultType="cn.fzw.vo.AccountSelect">
+SELECT
+	count(*) count,
+	sum(
+		CASE
+		WHEN flag = '1'
+		THEN
+			money
+		ELSE
+			0
+		END
+	) sumFlag1,
+	sum(
+		CASE
+		WHEN flag = '2'
+		THEN
+			money
+		ELSE
+			0
+		END
+	) sumFlag2
+FROM
+	account_db
+WHERE
+	username =#{username} and time between #{time} and DATE_ADD(#{_time},INTERVAL 1 DAY)
+  </select>
+  
+  <delete id="deleteAccountById" parameterType="java.lang.Integer"> 
+  delete from account_db where id=#{id}
+  </delete>
+  <update id="updateAccountById">
+  	update account_db set item=#{item},account=#{account},money=#{money},item_desc=#{item_desc},time=#{time} where id=#{id}
+  </update>
+  
+  </mapper>
